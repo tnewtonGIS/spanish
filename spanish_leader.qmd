@@ -1,0 +1,390 @@
+---
+title: "Famous Spanish Persona"
+editor: visual
+author: Travis Newton
+date: 2026-02-28
+format: 
+  revealjs:
+    footer: "GMU SPN110" 
+    transition: fade
+    transition-speed: slow
+    title-slide-attributes: 
+      data-background-image: img/gmu_green.jpg
+      data-background-size: 10%
+      data-background-opacity: 25%
+      data-background-position: center bottom 15%
+    smaller: true
+    scrollable: false
+    logo: img/gmu_green.jpg
+    slide-number: true
+    chalkboard: true
+    theme: solarized
+    css: styles.css
+---
+
+```{r}
+#| echo: false
+library(tidyverse)
+library(tigris)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf)
+library(grid)
+library(lwgeom)
+library(ggspatial)
+library(janitor)
+
+```
+
+```{r}
+#| echo: false
+#new slides start at ## level
+```
+
+## Who {background-image="img/white_contour.jpg" background-opacity=".15" background-size="contain" background-repeat="repeat"}
+
+::::: columns
+::: {.column width="70%"}
+**Persona**: Jose Matias Delgado
+
+**Known as**: el Padre de El Salvador
+
+**Edad**: 1767-1832
+
+**Padres**: Panama y Guatamalen ambos creoles (born from conquistador lines)
+
+**Pais**: El Salvador
+
+**Universidad**: Guatamala city \@
+
+-   Tridentine College y Seminary of Our Lady de la Assumption
+
+-   Universidad de San Carlos
+
+**Mayor**: Cannon Law and Theology (1782-1796)
+
+**Trabajo**: Sacerdote – Politico - Juez
+:::
+
+::: {.column width="30%"}
+![Delgado painting](img/delgado.jpg){fig-align="right"}
+:::
+:::::
+
+## Famous porque {background-image="img/white_contour.jpg" background-opacity=".15" background-size="contain" background-repeat="repeat"}
+
+::::: columns
+::: {.column width="85%"}
+-   1811 Leader in the 1st independence movement
+
+-   1820 Sent from Guatemala City back to San Salvador as provincial deputy
+
+-   1821 Becomes 2nd president after 1st one killed in battle after 3 months
+
+-   1823 Sent as a constituent congress to the Federal Republic of Central America (FRCA): *equivalent to 1st continental congress*
+
+-   1824 Appointed 1st Bishop of San Salvador
+
+-   1824 Creates 1st newspaper with public funds lasting until 1850
+
+-   1832 President of the National Assembly (NA) : *the NA is equivalent to US Congress*
+
+-   1833 designated by NA as "Meritorious of the Fatherland"
+
+-   1967 NA awards a second title as "Father of the Central American Fatherland"\
+:::
+
+::: {.column width="15%"}
+![Statue in San Salvador](img/delgado_statue.jpg)
+:::
+:::::
+
+## Background {background-image="img/white_contour.jpg" background-opacity=".15" background-size="contain" background-repeat="repeat"}
+
+::::: columns
+::: {.column width="50%"}
+-   From 1500-1800s country of New Spain
+
+-   Operated under the Caste System
+
+-   Primarily enslavement for silver, gold mines
+
+    -   First 30 years just looting resources
+
+-   Later moved into ranching, farming plantations
+:::
+
+::: {.column width="50%"}
+![New Spain](img/newspain_map.PNG){fig-align="right"}
+:::
+:::::
+
+## Caste System {background-image="img/white_contour.jpg" background-opacity=".15" background-size="contain" background-repeat="repeat"}
+
+::::: columns
+::: {.column width="50%"}
+1.  Peninsular - Iberian born
+
+2.  Creole - Iberian parents, America born – **Padre Delgado**
+
+3.  Mestizo - 1 euro + 1 indio
+
+4.  Mulato - 1 euro + 1 african
+
+5.  Indio - 1 indo + 1 indio
+
+6.  Lobo - 1 indio + 1 african
+
+7.  African - 1 african + 1 african
+:::
+
+::: {.column width="50%"}
+![Caste chart](img/castas.jpg){fig-align="right" width="55%"}
+:::
+:::::
+
+## Reference {.map-slide background-image="img/white_contour.jpg" background-opacity=".15" background-size="contain" background-repeat="repeat"}
+
+-   El Salvador es el poco hispania pais
+
+-   Size de New Jersey
+
+```{r}
+#| echo: false
+
+options(tigris_use_cache = TRUE)  # optional but nice for speed
+
+# 1. Get New Jersey state boundary (cartographic boundary version)
+nj_state <- states(cb = TRUE, year = 2024)
+nj_state <- nj_state[nj_state$STUSPS == "NJ", ]
+
+
+nj <- ggplot(nj_state) +
+  geom_sf(fill = "gray90", color = "black") +
+  coord_sf() +
+  theme_void() +
+  annotation_scale(location = "bl", width_hint = 0.5, dist=100, dist_unit="km") +
+  labs(title = "New Jersey",caption = "22k sqkm")
+
+
+# get El Salvador (country boundary)
+sv <- ne_countries(
+  country = "El Salvador",
+  scale = "medium",
+  returnclass = "sf"
+)
+
+san <- ggplot(sv) +
+  geom_sf(fill = "gray90", color = "black", linewidth = 0.4) +
+  coord_sf() +
+  theme_void() +
+  annotation_scale(location = "bl", width_hint = 0.5, dist=100, dist_unit="km") +
+  labs(title = "El Salvador",caption = "21k sqkm")
+
+
+```
+
+::::: columns
+::: {.column width="50%"}
+```{r}
+
+nj
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+
+san
+```
+:::
+:::::
+
+```{r}
+#| echo: false
+#| 
+# Countries subset
+central_america <- c("Guatemala", "El Salvador", "Honduras", "Nicaragua", "Costa Rica")
+gran_colombia   <- c("Panama", "Colombia", "Venezuela")
+
+countries <- ne_countries(scale = "medium", returnclass = "sf") %>%
+  filter(admin %in% c(central_america, gran_colombia))
+
+```
+
+```{r}
+#| echo: false
+#| 
+countries <- countries %>%
+  mutate(region_group = case_when(
+    admin %in% central_america ~ "Old Guatemala (Captaincy)",
+    admin %in% gran_colombia   ~ "Gran Colombia",
+    TRUE ~ "Other"
+  ))
+```
+
+```{r}
+#| echo: false
+#| 
+
+bbox <- sf::st_bbox(countries)
+
+
+old_spain <- ggplot(countries) +
+  geom_sf(aes(fill = region_group), color = "white", size = 0.3) +
+  scale_fill_manual(
+    name = "Countries",   # ← legend title
+    values = c(
+      "Old Guatemala (Captaincy)" = "#1f78b4",
+      "Gran Colombia"             = "#33a02c"
+    )
+  ) +
+coord_sf(expand = FALSE, crs = st_crs(4326)) + 
+  labs(
+    title = "Historical Regions Hispania",
+    subtitle = "Post 1824 division"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom",
+        plot.title = element_text(face = "bold")
+  )
+
+```
+
+## Domino Effect...*Unfolding of the old Empire* {background-image="img/white_contour.jpg" background-opacity=".15" background-size="contain" background-repeat="repeat"}
+
+::::: columns
+::: {.column .r-fit-text .fit-box width="80%"}
+-   1808 Bonaparte conquers Espana. Places el hermano in charge of Spain & Colonies
+
+-   1808-1821 New spain Viceroy and Govener control split between old & new systems
+
+-   1811 The 1st Independence begins
+
+    -   Tres llaves players: Jose Delgado (brains), Manual Jose Arce (bronze), Santiago Celis (medico)
+
+        -   John Adams, George Washington, Ben Franklin/Thomas Jefferson
+
+    -   Signal church bell of La Merced, 3 units confiscate arms and funds of treasury
+
+    -   Liberty cry *"There is no King, nor Intendant, nor Captain General. We only must obey our alcaldes"*
+
+-   Independence lasts month, Royal authority re-established. All parties promises to do better.
+
+-   1813 Delgado appointed provincial deputy Guatemala City and Seminary director.
+
+-   1814 2nd Independence movement.
+
+    -   Delgado - not in country
+
+    -   Arce - 4yrs jail
+
+    -   Celis - 4yrs jail and dies after release
+:::
+
+::: {.column width="20%"}
+![Arce](img/arce.jpg){fig-align="right" width="55%"}
+
+![Celis](img/celis.jpg){fig-align="right" width="55%"}
+:::
+:::::
+
+## Spain rule phase out {background-image="img/white_contour.jpg" background-opacity=".15" background-size="contain" background-repeat="repeat"}
+
+::::: columns
+::: {.column .r-fit-text .fit-box width="40%"}
+-   1819 - 1821 Pedro Barriere appointed governor of El Salvador under New Spain
+
+-   1821 New Spain declares independence from Spain becomes 1st Mexican empire
+
+    -   Captaincy of Guatemala independence, joins Mexican empire. Includes all central America intendants
+
+    -   El Salvador declares independence from coalition. Delgado assumes presidency after Barriere KIA
+
+-   1823 surrender to Guatemalan forces. Mexico grants autonomous rule of central America
+
+-   1823 - 1824 countries become "The United Provinces of Central America".
+
+-   1832 Father Delgado dies of flu (most likely)
+:::
+
+::: {.column width="60%"}
+```{r}
+old_spain
+```
+:::
+:::::
+
+## FRCA Conflict
+
+::::: columns
+::: {.column width="50%"}
+-   1825 notably Arce become the FRCA 1st president
+
+-   1827-1829 FRCA 1st Civil War
+
+-   1838-1841 FRCA 2nd Civil war fractures and dissolves one country at a time
+
+-   1838 increase in populations result in multiple issues
+
+    -   Cholera, political, social, poverty, religious, federal funding / tax collection
+
+    -   Nicaragua first to break way
+
+-   1841 Civil War ends
+
+    -   Treaty affirms trade/ commerace clauses between countries
+:::
+
+::: {.column width="50%"}
+![Original UPCA Flag](img/UPCF_flag.png)
+:::
+:::::
+
+## Reflection Question {background-image="img/white_contour.jpg" background-opacity=".15" background-size="contain" background-repeat="repeat"}
+
+Q: Lets consider Father Delgado as the John Adams, and General Arce to General Washington, why did the General not become the Salvadorian Preisidente?
+
+::::: columns
+::: {.column width="50%"}
+![Delgado](img/delgado.jpg)
+:::
+
+::: {.column width="50%"}
+![Arce](img/arce.jpg)
+:::
+:::::
+
+## Reflection Answer {background-image="img/white_contour.jpg" background-opacity=".15" background-size="contain" background-repeat="repeat"}
+
+A: Acre was fighting and sent to US for an El Salvador alliance in 1823. After the war he gathered troops in Mexico for the liberation of Cuba. When he returned in 1824 he was appointed to UCPA level leadership and then 1825 FRCA President. Delgado also had 20years of age on Arce, so to Salvadorians, he was the true leader of 1811.
+
+![Father Delgado (Arce, Celis behind)](img/delgado_1811.JPG){fig-align="center" width="376" height="266"}
+
+## References {background-image="img/white_contour.jpg" background-opacity=".15" background-size="contain" background-repeat="repeat"}
+
+::::: columns
+::: {.column width="50%"}
+-   Books
+
+    -   [Central Americas Forgotten History (chapter 1, 6)](https://www.amazon.com/Central-Americas-Forgotten-History-Revolution/dp/0807055417/ref=tmm_pap_swatch_0?_encoding=UTF8&dib_tag=se&dib=eyJ2IjoiMSJ9.KKsrdjXgnP2-Z_bIDoBGiDWLktGxRkkYIT1WnjekGf5OrLTmIw2eeg9QpZKLqtkpvXeVvliPeAi5pWKVwNvfIeL2cWZJV5d_p1H-yG-V9Zo02GQ34hU6eHsDoMLd_a762xBQkaKuLFVCBkHHTCOyjaOgD9tuyOTedWww4jebLugTkuwFB-D0OJyuVf4h2TY7dI1mF23A2l92jv-H75x7E_V4iDbHiEqfjiBvSRr1QEY.vDE-s0GgbfJGdkKW5h9hoWIDz-e89FW8FBttqdjCWxA&qid=1771881940&sr=1-1 "Book")
+
+    -   [History of the Americas (chapter 1-2)](https://www.amazon.com/IB-History-Americas-Course-Book/dp/0198390157 "Book")
+
+-   Wikipedia
+
+    -   [Jose Matias Delgado](https://en.wikipedia.org/wiki/Jos%C3%A9_Mat%C3%ADas_Delgado "Wiki")
+
+    -   [1811 Independence Movement](https://en.wikipedia.org/wiki/1811_Independence_Movement "Wiki")
+
+    -   [First Republic of Central America](https://en.wikipedia.org/wiki/Federal_Republic_of_Central_America "Wiki")
+
+    -   [History of El Salvador](https://en.wikipedia.org/wiki/History_of_El_Salvador "Wiki")
+
+    -   [First Mexican Empire](https://en.wikipedia.org/wiki/First_Mexican_Empire "Wiki")
+:::
+
+::: {.column width="50%"}
+![](img/ca_book.jpg){fig-align="center"}
+:::
+:::::
