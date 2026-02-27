@@ -1,0 +1,58 @@
+/* Increase left/right margins for all slides */
+.reveal .slides {
+  width: 85% !important;   /* default is ~70% */
+  margin: 0 auto !important;
+}
+
+/* Optional: increase top/bottom padding */
+.reveal section {
+  padding-top: 40px !important;
+  padding-bottom: 40px !important;
+}
+
+
+/* Only affects slides with {.map-slide} */
+.reveal .map-slide .columns {
+  height: 60vh;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.reveal .map-slide .column {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reveal .map-slide .map {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+
+/*Center figure captions*/
+
+.reveal figcaption {
+  text-align: center !important;
+}
+
+
+/* Center captions for ALL standalone figures */
+.reveal figure.quarto-figure figcaption {
+  text-align: center !important;
+  width: 100%;
+}
+
+
+
+
+/* Give the column a fixed vertical space so r-fit-text can work */
+.reveal .fit-box {
+  height: 100vh;        /* adjust as needed */
+  overflow: hidden;    /* required for r-fit-text to detect overflow */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
