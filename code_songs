@@ -1,0 +1,35 @@
+# Requirements
+# install.packages(c("tidyverse", "stringr"))
+library(tidyverse)
+library(stringr)
+
+# Path to input text file
+txt_path <- "input.txt"  # change to your file
+
+# Read file as single string
+text <- read_file(txt_path)
+
+# Convert to lowercase, replace non-letters/apostrophes with space, split into words
+words <- text %>%
+  str_to_lower() %>%
+  # keep letters and internal apostrophes, replace everything else with space
+  str_replace_all("[^\\p{L}'’]+", " ") %>%
+  # normalize apostrophes
+  str_replace_all("’", "'") %>%
+  str_trim() %>%
+  str_split("\\s+") %>%
+  unlist() %>%
+  # remove empty tokens
+  discard(~ .x == "")
+
+# Create a tibble long of word counts, sorted alphabetically
+word_counts <- tibble(word = words) %>%
+  count(word, name = "count", sort = FALSE) %>%
+  arrange(word)
+
+# Show result
+print(word_counts)
+
+# Optionally write to CSV
+# write_csv(word_counts, "word_counts_alphabetical.csv")
+
